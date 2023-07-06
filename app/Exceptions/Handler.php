@@ -28,12 +28,16 @@ class Handler extends ExceptionHandler
         });
 
         $this->renderable(function (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
+            return response()->json(['success' => false, 'message' => "Token Expired", 'code' => 401], 401);
         });
         $this->renderable(function (\Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
+            return response()->json(['success' => false, 'message' => "Token invalid", 'code' => 401], 401);
         });
         $this->renderable(function (\Tymon\JWTAuth\Exceptions\JWTException $e) {
+            return response()->json(['success' => false, 'message' => "Unauthorized", 'code' => 401], 401);
         });
         $this->renderable(function (\Tymon\JWTAuth\Exceptions\TokenBlacklistedException $e) {
+            return response()->json(['success' => false, 'message' => "Token blacklist", 'code' => 401], 401);
         });
     }
 }

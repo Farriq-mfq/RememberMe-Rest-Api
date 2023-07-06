@@ -34,4 +34,23 @@ class AuthController extends Controller
             return response()->json(['success' => false, 'message' => "Internal server error", 'code' => 500], 500);
         }
     }
+
+    public function me()
+    {
+        try {
+            return response()->json(['status' => true, 'me' => auth()->user()]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => "Internal server error", 'code' => 500], 500);
+        }
+    }
+
+    public function logout()
+    {
+        try {
+            auth()->logout();
+            return response()->json(['status' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => "Internal server error", 'code' => 500], 500);
+        }
+    }
 }
