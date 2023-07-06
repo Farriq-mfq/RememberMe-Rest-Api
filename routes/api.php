@@ -22,7 +22,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 Route::prefix('v1')->group(function () {
-    Route::resource('todo', TodoController::class);
+    Route::resource('todo', TodoController::class)->middleware('jwtAuth');
     Route::prefix('auth')->group(function () {
         Route::post('/login', [AuthController::class, 'login']);
 
