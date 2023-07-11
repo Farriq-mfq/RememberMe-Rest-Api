@@ -23,10 +23,13 @@ class AuthController extends Controller
             $token = Auth::attempt($credentials);
 
             if ($token) {
+                $user = User::where('email',$credentials['email'])->first();
+
                 $data = [
                     'token' => $token,
                     'token_type' => 'bearer',
-                    'expires_in' => auth()->factory()->getTTL() * 60
+                    'expires_in' => auth()->factory()->getTTL() * 60,
+                    'authState' => $user
                 ];
                 return response()->json(['status' => true, ...$data]);
             }
