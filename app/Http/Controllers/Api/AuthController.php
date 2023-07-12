@@ -23,7 +23,7 @@ class AuthController extends Controller
             $token = Auth::attempt($credentials);
 
             if ($token) {
-                $user = User::where('email',$credentials['email'])->first();
+                $user = User::where('email', $credentials['email'])->first();
 
                 $data = [
                     'token' => $token,
@@ -32,6 +32,8 @@ class AuthController extends Controller
                     'authState' => $user
                 ];
                 return response()->json(['status' => true, ...$data]);
+            } else {
+                return response()->json(['success' => false, 'message' => "Invalid email dan password", 'code' => 401], 401);
             }
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => "Internal server error", 'code' => 500], 500);
