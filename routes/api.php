@@ -25,8 +25,10 @@ Route::prefix('v1')->group(function () {
     Route::resource('todo', TodoController::class)->middleware('jwtAuth');
     Route::prefix('auth')->group(function () {
         Route::post('/login', [AuthController::class, 'login']);
+        Route::post('/register', [AuthController::class, 'register']);
 
         Route::get('/me', [AuthController::class, 'me'])->middleware('jwtAuth');
-        Route::get('/logout', [AuthController::class, 'logout'])->middleware('jwtAuth');
+        Route::post('/logout', [AuthController::class, 'logout'])->middleware('jwtAuth');
+        Route::post('/refresh', [AuthController::class, 'refresh'])->middleware('jwtAuth');
     });
 });
