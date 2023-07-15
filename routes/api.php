@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\IconController;
 use App\Http\Controllers\Api\TodoController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -22,6 +23,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 Route::prefix('v1')->group(function () {
+    Route::get('icons', [IconController::class, 'index']);
     Route::resource('todo', TodoController::class)->middleware('jwtAuth');
     Route::prefix('auth')->group(function () {
         Route::post('/login', [AuthController::class, 'login']);
