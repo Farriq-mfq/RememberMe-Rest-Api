@@ -3,20 +3,25 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\IconResource;
 use App\Models\Icon;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class IconController extends Controller
 {
+    protected Icon $icon;
+    public function __construct()
+    {
+        $this->icon = new Icon();
+    }
     public function index()
     {
-        $get_all_storege = Storage::disk('public')->allFiles('icons');
-        $icon_model = new Icon();
-        foreach ($get_all_storege as $icon) {
-            $icon_model->create([
-                'icon' => explode('/', $icon)[1]
-            ]);
+        try {
+            $all = $this->icon->all();
+            $iconResource = IconResource::collection($all);
+            return response()->json(['success' => true, 'message' => 'berhasil get data icons', 'icons' => $iconResource, 'code' => 200]);
+        } catch (\Exception $e) {
+            dd($e->getMessage());
+            return response()->json(['success' => false, 'message' => "Internal server error", 'code' => 500], 500);
         }
     }
 }
