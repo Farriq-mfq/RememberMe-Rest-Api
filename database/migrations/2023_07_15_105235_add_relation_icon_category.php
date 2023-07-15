@@ -11,12 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('todos', function (Blueprint $table) {
-            $table->id();
-            $table->string("title");
-            $table->text("content");
-            $table->boolean("pinned")->default(false);
-            $table->timestamps();
+        Schema::table('categories', function (Blueprint $table) {
+            $table->foreign('id_icon')->on('icons')->references('id')->onDelete('set null')->onUpdate('cascade');
         });
     }
 
@@ -25,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('todos');
+        Schema::table('categories', function (Blueprint $table) {
+            // $table->dropForeign('');
+        });
     }
 };

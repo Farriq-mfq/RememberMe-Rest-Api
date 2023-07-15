@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\Todo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -20,10 +21,16 @@ class TodoController extends Controller
      */
     public function index()
     {
+        /**
+         * DONE
+         */
         try {
-            $all = $this->todo->orderBy('created_at', "DESC")->all();
+            $all = $this->todo->orderBy('created_at', "DESC")->with(['category' => function ($q) {
+                return $q->with('icon');
+            }])->where('user_id', auth()->user()->id)->cursorPaginate();
             return response()->json(['success' => true, 'message' => 'berhasil get data todo', 'todos' => $all, 'code' => 200]);
         } catch (\Exception $e) {
+            dd($e->getMessage());
             return response()->json(['success' => false, 'message' => "Internal server error", 'code' => 500], 500);
         }
     }
@@ -40,15 +47,27 @@ class TodoController extends Controller
      */
     public function store(Request $request)
     {
+        /**
+         * DONE
+         */
         try {
-            $validate = Validator::make($request->only('title', 'content', 'background'), ['title' => 'required', 'content' => 'required', 'background' => 'required']);
+            $validate = Validator::make($request->only('title', 'content', 'id_category', 'user_id'), ['title' => 'required', 'content' => 'required', 'id_category' => 'numeric|nullable']);
             if ($validate->fails()) {
                 return response()->json(['success' => false, 'validations' => $validate->errors(), 'code' => 400], 400);
             }
+            if ($request->id_category) {
+                $category = new Category();
+                $check_category_exist = $category->find($request->id_category);
+                if ($check_category_exist == null) {
+                    return response()->json(['success' => false, 'error' => "Category does'nt exist", 'code' => 400], 400);
+                }
+            }
+
             $created = $this->todo->create([
                 'title' => $request->title,
                 'content' => $request->content,
-                'background' => $request->background,
+                'id_category' => $request->id_category ?? null,
+                'user_id' => auth()->user()->id,
             ]);
             if ($created) {
                 return response()->json(['success' => true, 'message' => 'berhasil menyimpan todo', 'code' => 200]);
@@ -56,7 +75,7 @@ class TodoController extends Controller
                 return response()->json(['success' => false, 'message' => 'gagal menyimpan todo', 'code' => 400], 400);
             }
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => "Internal server error", 'code' => 500, 'detail_error' => $e->getMessage()], 500);
+            return response()->json(['success' => false, 'message' => "Internal server error", 'code' => 500,], 500);
         }
     }
 
@@ -73,8 +92,11 @@ class TodoController extends Controller
      */
     public function edit(string $id)
     {
+        /**
+         * DONE
+         */
         try {
-            $todo = $this->todo->orderBy('created_at', "DESC")->find($id);
+            $todo = $this->todo->orderBy('created_at', "DESC")->where('user_id', auth()->user()->id)->find($id);
             if ($todo != null) {
                 return response()->json(['success' => true, 'message' => 'berhasil get data todo', 'todo' => $todo, 'code' => 200]);
             } else {
@@ -90,15 +112,19 @@ class TodoController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        /**
+         * DONE
+         */
         try {
-            $validate = Validator::make($request->only('title', 'content', 'background'), ['title' => 'required', 'content' => 'required', 'background' => 'required']);
+            $validate = Validator::make($request->only('title', 'content', 'id_category', 'user_id'), ['title' => 'required', 'content' => 'required', 'id_category' => 'numeric|nullable']);
             if ($validate->fails()) {
                 return response()->json(['success' => false, 'validations' => $validate->errors(), 'code' => 400], 400);
             }
-            $created = $this->todo->where('id', $id)->update([
+            $created = $this->todo->where('user_id', auth()->user()->id)->where('id', $id)->update([
                 'title' => $request->title,
                 'content' => $request->content,
-                'background' => $request->background,
+                'id_category' => $request->id_category ?? null,
+                'user_id' => auth()->user()->id,
             ]);
             if ($created) {
                 return response()->json(['success' => true, 'message' => 'berhasil update todo', 'code' => 200]);
@@ -106,7 +132,6 @@ class TodoController extends Controller
                 return response()->json(['success' => false, 'message' => 'gagal update todo', 'code' => 400], 400);
             }
         } catch (\Exception $e) {
-            dd($e->getMessage());
             return response()->json(['success' => false, 'message' => "Internal server error", 'code' => 500], 500);
         }
     }
@@ -117,7 +142,7 @@ class TodoController extends Controller
     public function destroy(string $id)
     {
         try {
-            $deleted = $this->todo->where('id', $id)->delete();
+            $deleted = $this->todo->where('user_id', auth()->user()->id)->where('id', $id)->delete();
             if ($deleted) {
                 return response()->json(['success' => true, 'message' => 'berhasil delete todo', 'code' => 200]);
             } else {

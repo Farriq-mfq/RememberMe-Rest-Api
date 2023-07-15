@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('categories', function (Blueprint $table) {
-            $table->foreign('id_icon')->on('icons')->references('id')->onDelete('set null')->onUpdate('set null');
+        Schema::table('todos', function (Blueprint $table) {
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->on('users')->references('id')->onDelete('cascade')->onUpdate('cascade');
         });
     }
 
@@ -21,8 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('categories', function (Blueprint $table) {
-            $table->dropForeign('categories_id_icon_foreign');
+        Schema::table('todos', function (Blueprint $table) {
+            $table->dropForeign('todos_user_id_foreign');
         });
     }
 };
