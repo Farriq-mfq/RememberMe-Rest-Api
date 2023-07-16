@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\CategoryResource;
 use App\Models\Category;
 use App\Models\Icon;
 use Illuminate\Http\Request;
@@ -28,7 +29,7 @@ class CategoryController extends Controller
         try {
             $all = $this->category
                 ->with('icon')->where('user_id', auth()->user()->id)->get();
-            return response()->json(['success' => true, 'message' => 'berhasil get data categories', 'categories' => $all, 'code' => 200]);
+            return response()->json(['success' => true, 'message' => 'berhasil get data categories', 'categories' => CategoryResource::collection($all), 'code' => 200]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => "Internal server error", 'code' => 500], 500);
         }
