@@ -11,6 +11,7 @@ class Category extends Model
 {
     use HasFactory;
 
+    protected $fillable = ["category_name", "id_icon", "category_color", "user_id"];
     public function todos(): HasMany
     {
         return $this->hasMany(Todo::class, 'id_category', 'id');

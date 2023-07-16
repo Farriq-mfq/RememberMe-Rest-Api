@@ -30,7 +30,6 @@ class TodoController extends Controller
             }])->where('user_id', auth()->user()->id)->cursorPaginate();
             return response()->json(['success' => true, 'message' => 'berhasil get data todo', 'todos' => $all, 'code' => 200]);
         } catch (\Exception $e) {
-            dd($e->getMessage());
             return response()->json(['success' => false, 'message' => "Internal server error", 'code' => 500], 500);
         }
     }
@@ -51,7 +50,7 @@ class TodoController extends Controller
          * DONE
          */
         try {
-            $validate = Validator::make($request->only('title', 'content', 'id_category', 'user_id'), ['title' => 'required', 'content' => 'required', 'id_category' => 'numeric|nullable']);
+            $validate = Validator::make($request->only('title', 'content', 'id_category'), ['title' => 'required', 'content' => 'required', 'id_category' => 'numeric|nullable']);
             if ($validate->fails()) {
                 return response()->json(['success' => false, 'validations' => $validate->errors(), 'code' => 400], 400);
             }
@@ -96,7 +95,7 @@ class TodoController extends Controller
          * DONE
          */
         try {
-            $todo = $this->todo->orderBy('created_at', "DESC")->where('user_id', auth()->user()->id)->find($id);
+            $todo = $this->todo->where('user_id', auth()->user()->id)->find($id);
             if ($todo != null) {
                 return response()->json(['success' => true, 'message' => 'berhasil get data todo', 'todo' => $todo, 'code' => 200]);
             } else {
@@ -116,7 +115,7 @@ class TodoController extends Controller
          * DONE
          */
         try {
-            $validate = Validator::make($request->only('title', 'content', 'id_category', 'user_id'), ['title' => 'required', 'content' => 'required', 'id_category' => 'numeric|nullable']);
+            $validate = Validator::make($request->only('title', 'content', 'id_category'), ['title' => 'required', 'content' => 'required', 'id_category' => 'numeric|nullable']);
             if ($validate->fails()) {
                 return response()->json(['success' => false, 'validations' => $validate->errors(), 'code' => 400], 400);
             }
@@ -124,7 +123,6 @@ class TodoController extends Controller
                 'title' => $request->title,
                 'content' => $request->content,
                 'id_category' => $request->id_category ?? null,
-                'user_id' => auth()->user()->id,
             ]);
             if ($created) {
                 return response()->json(['success' => true, 'message' => 'berhasil update todo', 'code' => 200]);
