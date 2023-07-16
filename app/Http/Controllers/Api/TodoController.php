@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\TodoResource;
 use App\Models\Category;
 use App\Models\Todo;
 use Illuminate\Http\Request;
@@ -27,8 +28,8 @@ class TodoController extends Controller
         try {
             $all = $this->todo->orderBy('created_at', "DESC")->with(['category' => function ($q) {
                 return $q->with('icon');
-            }])->where('user_id', auth()->user()->id)->cursorPaginate();
-            return response()->json(['success' => true, 'message' => 'berhasil get data todo', 'todos' => $all, 'code' => 200]);
+            }])->where('user_id', auth()->user()->id)->get();
+            return response()->json(['success' => true, 'message' => 'berhasil get data todo', 'todos' => TodoResource::collection($all), 'code' => 200]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => "Internal server error", 'code' => 500], 500);
         }

@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class CategoryResource extends JsonResource
+class TodoResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,9 +16,10 @@ class CategoryResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'category_name' => $this->category_name,
-            'category_color' => $this->category_color,
-            'icon' => new IconResource($this->icon)
+            'title' => $this->title,
+            'pinned' => $this->pinned,
+            'created_at' => $this->created_at,
+            'category' => new CategoryResource($this->category)
         ];
     }
 }
