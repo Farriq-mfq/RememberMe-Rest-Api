@@ -52,7 +52,7 @@ class CategoryController extends Controller
          * DONE
          */
         try {
-            $validate = Validator::make($request->only('name', 'color', 'id_icon'), ['name' => 'required', 'color' => 'required', 'id_icon' => 'numeric|nullable']);
+            $validate = Validator::make($request->only('name', 'color', 'id_icon'), ['name' => 'required', 'color' => 'required', 'id_icon' => 'numeric|required']);
             if ($validate->fails()) {
                 return response()->json(['success' => false, 'validations' => $validate->errors(), 'code' => 400], 400);
             }
@@ -118,7 +118,7 @@ class CategoryController extends Controller
          * DONE
          */
         try {
-            $validate = Validator::make($request->only('name', 'color', 'id_icon'), ['name' => 'required', 'color' => 'required', 'id_icon' => 'numeric|nullable']);
+            $validate = Validator::make($request->only('name', 'color', 'id_icon'), ['name' => 'required', 'color' => 'required', 'id_icon' => 'numeric|required']);
             if ($validate->fails()) {
                 return response()->json(['success' => false, 'validations' => $validate->errors(), 'code' => 400], 400);
             }
