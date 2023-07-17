@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\TodoResource;
 use App\Models\Category;
 use App\Models\Todo;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -20,15 +21,52 @@ class TodoController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         /**
          * DONE
          */
         try {
-            $all = $this->todo->orderBy('created_at', "DESC")->with(['category' => function ($q) {
-                return $q->with('icon');
-            }])->where('user_id', auth()->user()->id)->get();
+            if ($request->filter) {
+                switch ($request->filter) {
+                    case 'completed':
+                        $all = $this->todo->orderBy('created_at', "DESC")->where('pinned', true)->with(['category' => function ($q) {
+                            return $q->with('icon');
+                        }])->where('user_id', auth()->user()->id)->get();
+                        break;
+                    case 'today':
+                        $all = $this->todo->orderBy('created_at', "DESC")->whereDate('created_at', Carbon::today())->with(['category' => function ($q) {
+                            return $q->with('icon');
+                        }])->where('user_id', auth()->user()->id)->get();
+                        break;
+                    case 'date':
+                        if ($request->date) {
+                            $validate_date = Validator::make($request->only('date'), ['date' => 'date']);
+                            // dd($validate_date);
+                            if ($validate_date->fails()) {
+                                return response()->json(['success' => false, 'message' => "Invalid date filter", 'code' => 400], 400);
+                            } else {
+                                $all = $this->todo->orderBy('created_at', "DESC")->whereDate('created_at', Carbon::parse($request->date))->with(['category' => function ($q) {
+                                    return $q->with('icon');
+                                }])->where('user_id', auth()->user()->id)->get();
+                            }
+                        } else {
+                            $all = $this->todo->orderBy('created_at', "DESC")->whereDate('created_at', Carbon::today())->with(['category' => function ($q) {
+                                return $q->with('icon');
+                            }])->where('user_id', auth()->user()->id)->get();
+                        }
+                        break;
+                    default:
+                        $all = $this->todo->orderBy('created_at', "DESC")->with(['category' => function ($q) {
+                            return $q->with('icon');
+                        }])->where('user_id', auth()->user()->id)->get();
+                        break;
+                }
+            } else {
+                $all = $this->todo->orderBy('created_at', "DESC")->with(['category' => function ($q) {
+                    return $q->with('icon');
+                }])->where('user_id', auth()->user()->id)->get();
+            }
             return response()->json(['success' => true, 'message' => 'berhasil get data todo', 'todos' => TodoResource::collection($all), 'code' => 200]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => "Internal server error", 'code' => 500], 500);
@@ -148,6 +186,40 @@ class TodoController extends Controller
                 return response()->json(['success' => true, 'message' => 'gagal delete todo', 'code' => 400], 400);
             }
         } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => "Internal server error", 'code' => 500], 500);
+        }
+    }
+
+
+    /**
+     * update pinned status completed for task
+     */
+
+    public function updatePinned(string $id)
+    {
+        try {
+            $update = $this->todo->where('user_id', auth()->user()->id)->where('id', $id);
+            if ($update) {
+                $pinned = $update->first();
+                if ($pinned != null) {
+                    if ($update->first()->pinned) {
+                        $update->update([
+                            'pinned' => false
+                        ]);
+                    } else {
+                        $update->update([
+                            'pinned' => true
+                        ]);
+                    }
+                } else {
+                    return response()->json(['success' => true, 'message' => 'todo not found', 'code' => 401]);
+                }
+                return response()->json(['success' => true, 'message' => 'berhasil update pinned', 'code' => 200]);
+            } else {
+                return response()->json(['success' => true, 'message' => 'gagal delete pinned', 'code' => 400], 400);
+            }
+        } catch (\Exception $e) {
+            dd($e->getMessage());
             return response()->json(['success' => false, 'message' => "Internal server error", 'code' => 500], 500);
         }
     }

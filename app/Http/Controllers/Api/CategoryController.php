@@ -21,12 +21,13 @@ class CategoryController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         /**
          * DONE
          */
         try {
+
             $all = $this->category
                 ->with('icon')->where('user_id', auth()->user()->id)->get();
             return response()->json(['success' => true, 'message' => 'berhasil get data categories', 'categories' => CategoryResource::collection($all), 'code' => 200]);
