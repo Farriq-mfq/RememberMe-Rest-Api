@@ -35,7 +35,7 @@ class TodoController extends Controller
                         }])->where('user_id', auth()->user()->id)->get();
                         break;
                     case 'today':
-                        $all = $this->todo->orderBy('created_at', "DESC")->whereDate('created_at', Carbon::today())->with(['category' => function ($q) {
+                        $all = $this->todo->orderBy('created_at', "DESC")->whereDate('created_at', today(auth()->user()->timezone))->with(['category' => function ($q) {
                             return $q->with('icon');
                         }])->where('user_id', auth()->user()->id)->get();
                         break;
