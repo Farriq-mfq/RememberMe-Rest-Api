@@ -42,7 +42,6 @@ class TodoController extends Controller
                     case 'date':
                         if ($request->date) {
                             $validate_date = Validator::make($request->only('date'), ['date' => 'date']);
-                            // dd($validate_date);
                             if ($validate_date->fails()) {
                                 return response()->json(['success' => false, 'message' => "Invalid date filter", 'code' => 400], 400);
                             } else {
@@ -219,7 +218,6 @@ class TodoController extends Controller
                 return response()->json(['success' => true, 'message' => 'gagal delete pinned', 'code' => 400], 400);
             }
         } catch (\Exception $e) {
-            dd($e->getMessage());
             return response()->json(['success' => false, 'message' => "Internal server error", 'code' => 500], 500);
         }
     }
