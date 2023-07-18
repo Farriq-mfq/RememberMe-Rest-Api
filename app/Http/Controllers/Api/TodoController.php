@@ -34,6 +34,11 @@ class TodoController extends Controller
                             return $q->with('icon');
                         }])->where('user_id', auth()->user()->id)->get();
                         break;
+                    case 'uncomplted':
+                        $all = $this->todo->orderBy('created_at', "DESC")->where('pinned', false)->with(['category' => function ($q) {
+                            return $q->with('icon');
+                        }])->where('user_id', auth()->user()->id)->get();
+                        break;
                     case 'today':
                         $all = $this->todo->orderBy('created_at', "DESC")->whereDate('created_at', today(auth()->user()->timezone))->with(['category' => function ($q) {
                             return $q->with('icon');
@@ -61,6 +66,10 @@ class TodoController extends Controller
                         }])->where('user_id', auth()->user()->id)->get();
                         break;
                 }
+            } else if ($request->search) {
+                $all = $this->todo->orderBy('created_at', "DESC")->where('title', 'LIKE', '%' . $request->search . '%')->with(['category' => function ($q) {
+                    return $q->with('icon');
+                }])->where('user_id', auth()->user()->id)->get();
             } else {
                 $all = $this->todo->orderBy('created_at', "DESC")->with(['category' => function ($q) {
                     return $q->with('icon');

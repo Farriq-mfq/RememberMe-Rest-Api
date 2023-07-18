@@ -18,6 +18,7 @@ class TodoResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'pinned' => $this->pinned,
+            'content' => $this->content,
             'created_at' => $this->created_at,
             'category' => new CategoryResource($this->category)
         ];
