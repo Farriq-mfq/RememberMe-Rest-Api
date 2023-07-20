@@ -97,7 +97,7 @@ class TodoController extends Controller
          * DONE
          */
         try {
-            $validate = Validator::make($request->only('title', 'content', 'id_category'), ['title' => 'required', 'content' => 'required', 'id_category' => 'numeric|nullable']);
+            $validate = Validator::make($request->only('title', 'content', 'id_category'), ['title' => 'required', 'content' => 'required', 'id_category' => 'numeric|required']);
             if ($validate->fails()) {
                 return response()->json(['success' => false, 'validations' => $validate->errors(), 'code' => 400], 400);
             }
@@ -162,7 +162,7 @@ class TodoController extends Controller
          * DONE
          */
         try {
-            $validate = Validator::make($request->only('title', 'content', 'id_category'), ['title' => 'required', 'content' => 'required', 'id_category' => 'numeric|nullable']);
+            $validate = Validator::make($request->only('title', 'content', 'id_category'), ['title' => 'required', 'content' => 'required', 'id_category' => 'numeric|required']);
             if ($validate->fails()) {
                 return response()->json(['success' => false, 'validations' => $validate->errors(), 'code' => 400], 400);
             }
